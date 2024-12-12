@@ -28,7 +28,10 @@ const pool = new Pool({
             name VARCHAR(100),
             email VARCHAR(100) UNIQUE,
             phone VARCHAR(15),
-            country VARCHAR(50)
+            country VARCHAR(50),
+            submitted_from VARCHAR(50),
+            submit_time TIMESTAMP,
+            user_ip VARCHAR(50)
         );
     `;
     await pool.query(createTableQuery);
@@ -37,15 +40,26 @@ const pool = new Pool({
 
 // API endpoint to add a user
 app.post('/add-user', async (req, res) => {
-    const { name, email, phone, country } = req.body;
+    const { 
+        "contact-name": name, 
+        "contact-email": email, 
+        "contact-tel": phone, 
+        "contact-country": country, 
+        "submitted_from": submittedFrom,
+        "submit_time": submitTime,
+        "User_IP": userIp 
+    } = req.body;
 
-    if (!name || !email || !phone || !country) {
+    if (!name || !email || !phone || !country || !submittedFrom || !submitTime || !userIp) {
         return res.status(400).json({ error: 'All fields are required.' });
     }
 
     try {
-        const query = 'INSERT INTO users (name, email, phone, country) VALUES ($1, $2, $3, $4) RETURNING *';
-        const values = [name, email, phone, country];
+        const query = `
+            INSERT INTO users (name, email, phone, country, submitted_from, submit_time, user_ip) 
+            VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;
+        `;
+        const values = [name, email, phone, country, submittedFrom, submitTime, userIp];
         const result = await pool.query(query, values);
         res.status(201).json({ user: result.rows[0] });
     } catch (err) {
