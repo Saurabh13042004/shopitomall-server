@@ -50,7 +50,7 @@ app.post('/add-user', async (req, res) => {
         "User_IP": userIp 
     } = req.body;
 
-    if (!name || !email || !phone || !country || !submittedFrom || !submitTime || !userIp) {
+    if (!name || !email || !phone || !country ) {
         return res.status(400).json({ error: 'All fields are required.' });
     }
 
