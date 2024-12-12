@@ -41,28 +41,29 @@ const pool = new Pool({
 })();
 
 // API endpoint to add a user
+// API endpoint to add a user
 app.post('/add-user', async (req, res) => {
     const { 
         "contact-name": name, 
         "contact-email": email, 
         "contact-tel": phone, 
-        "contact-country": country, 
         "submitted_from": submittedFrom,
         "User_IP": userIp 
     } = req.body;
 
     const submitTime = req.body["submit_time"] || new Date().toISOString();
 
-    if (!name || !email || !phone || !country ) {
+    // Validate required fields
+    if (!name || !email || !phone) {
         return res.status(400).json({ error: 'All fields are required.' });
     }
 
     try {
         const query = `
-            INSERT INTO users (name, email, phone, country, submitted_from, submit_time, user_ip) 
-            VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;
+            INSERT INTO users (name, email, phone, submitted_from, submit_time, user_ip) 
+            VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;
         `;
-        const values = [name, email, phone, country, submittedFrom, submitTime, userIp];
+        const values = [name, email, phone, submittedFrom, submitTime, userIp];
         const result = await pool.query(query, values);
         res.status(201).json({ user: result.rows[0] });
     } catch (err) {
