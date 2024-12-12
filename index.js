@@ -46,9 +46,10 @@ app.post('/add-user', async (req, res) => {
         "contact-tel": phone, 
         "contact-country": country, 
         "submitted_from": submittedFrom,
-        "submit_time": submitTime,
         "User_IP": userIp 
     } = req.body;
+
+    const submitTime = req.body["submit_time"] || new Date().toISOString();
 
     if (!name || !email || !phone || !country ) {
         return res.status(400).json({ error: 'All fields are required.' });
